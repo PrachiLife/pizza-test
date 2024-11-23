@@ -9,6 +9,8 @@
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { routes } from 'vue-router/auto-routes'
 
+const userIsLogged = () => !!localStorage.getItem('userDetails');
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
@@ -31,6 +33,15 @@ router.onError((err, to) => {
 
 router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload')
+})
+
+router.beforeEach((to,from, next)=>{
+  if(!userIsLogged() && to.path !== '/login') {
+    return next('/login');
+  } else if(userIsLogged() && to.path === '/login') {
+    return next('/');
+  }
+  next();
 })
 
 export default router
